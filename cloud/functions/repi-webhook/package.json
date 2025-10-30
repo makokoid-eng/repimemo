@@ -1,0 +1,10 @@
+{
+  "name": "repi-webhook",
+  "version": "0.1.0",
+  "main": "index.js",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@line/bot-sdk": "^7.5.2",
+    "firebase-admin": "^12.5.0"
+  }
+}

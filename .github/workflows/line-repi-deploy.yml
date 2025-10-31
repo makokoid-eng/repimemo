@@ -18,9 +18,14 @@ jobs:
         with:
           node-version: "20"
 
+      # gcloud CLI を使えるようにする（authだけだと入ってないことがある）
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
+          # Secrets → Actions に登録した JSON の中身（GCP_CREDENTIALS）
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Deploy Cloud Functions v2 (repi-webhook)
@@ -31,5 +36,7 @@ jobs:
             --runtime=nodejs20 \
             --source=cloud/functions/repi-webhook \
             --entry-point=repiWebhook \
-            --trigger-http --allow-unauthenticated \
-            --set-env-vars FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }},OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},LINE_CHANNEL_SECRET_REPI=${{ secrets.LINE_CHANNEL_SECRET_REPI }},LINE_CHANNEL_ACCESS_TOKEN_REPI=${{ secrets.LINE_CHANNEL_ACCESS_TOKEN_REPI }}
+            --service-account="${{ vars.GCF_RUNTIME_SA }}" \
+            --trigger-http \
+            --allow-unauthenticated \
+            --set-env-vars "FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }},OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},LINE_CHANNEL_SECRET_REPI=${{ secrets.LINE_CHANNEL_SECRET_REPI }},LINE_CHANNEL_ACCESS_TOKEN_REPI=${{ secrets.LINE_CHANNEL_ACCESS_TOKEN_REPI }}"
